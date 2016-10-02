@@ -49,7 +49,7 @@ template <typename T>
 void usinePiece(File<T> &fileIn, File<T> &fileOut, int time) {
 	while (fileOut.taille()<100) {
 		if (!fileIn.estVide()) {
-			this_thread::sleep_for(chrono::seconds(time));
+			this_thread::sleep_for(chrono::milliseconds(time));
 			locker.lock();
 			fileOut.enfiler(fileIn.defiler());
 			locker.unlock();
@@ -121,11 +121,10 @@ int main()
 	remplirFile(mt,ma,mj);
 	
 	cout << mt << endl;
-	//passer la reference pas une copie
 
-	thread t(usinePiece<Axe>, ref(ma), ref(ma_usine), 2);
-	thread t1(usinePiece<Jupe>, ref(mj), ref(mj_usine), 3);
-	thread t2(usinePiece<Tete>, ref(mt), ref(mt_usine), 2);
+	thread t(usinePiece<Axe>, ref(ma), ref(ma_usine), 2500);
+	thread t1(usinePiece<Jupe>, ref(mj), ref(mj_usine), 3000);
+	thread t2(usinePiece<Tete>, ref(mt), ref(mt_usine), 2000);
 	thread t3(usinePiston, ref(mt_usine), ref(ma_usine), ref(mj_usine), pt);
 	
 	t.detach();
@@ -134,8 +133,10 @@ int main()
 	cout << "start usine Jupe" << endl;
 	t2.detach();
 	cout << "start usine Tete" << endl;
-	t3.join();
 	cout << "start Assemblage Pistons" << endl;
+	cout << "calcul en cours ..." << endl;
+	t3.join();
+	
 	//time calcul
 	chrono::steady_clock::time_point stop = chrono::steady_clock::now();
 	chrono::steady_clock::duration time = stop - start ;
